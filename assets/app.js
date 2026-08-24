@@ -289,10 +289,35 @@
       e.preventDefault();
       var status = form.querySelector(".form-status");
       var submitBtn = form.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.textContent = t("form.status", "Request received — we will be in touch shortly.");
-      if (status) status.classList.add("visible");
-      form.reset();
-      if (uploadLabel) uploadLabel.textContent = t("form.upload_title", "Choose files or drag them here");
+      var endpoint = (window.I18N && window.I18N.translations.en["settings.form_endpoint"] || "").trim();
+
+      function showSuccess() {
+        if (submitBtn) submitBtn.textContent = t("form.status", "Request received — we will be in touch shortly.");
+        if (status) { status.textContent = t("form.status", "Request received — we will be in touch shortly."); status.classList.add("visible"); }
+        form.reset();
+        if (uploadLabel) uploadLabel.textContent = t("form.upload_title", "Choose files or drag them here");
+      }
+
+      if (!endpoint) {
+        // No email endpoint configured yet (set one at /admin under "Settings" —
+        // key settings.form_endpoint — to start receiving these by email).
+        showSuccess();
+        return;
+      }
+
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Sending…"; }
+      var data = new FormData(form);
+      fetch(endpoint, {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" }
+      }).then(function (r) {
+        if (!r.ok) throw new Error("Submission failed");
+        if (submitBtn) submitBtn.disabled = false;
+        showSuccess();
+      }).catch(function () {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Something went wrong — please try again"; }
+      });
     });
   }
 

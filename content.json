@@ -228,7 +228,8 @@
       "page.bariatric.title": "Bariatric Surgery",
       "page.bariatric.sub": "Gastric sleeve, gastric bypass and metabolic weight-loss procedures, performed by experienced surgeons at accredited hospitals.",
       "page.bariatric.cta_title": "Ask About Bariatric Surgery",
-      "page.bariatric.cta_sub": "Share your medical reports and BMI history to receive a tailored treatment estimate."
+      "page.bariatric.cta_sub": "Share your medical reports and BMI history to receive a tailored treatment estimate.",
+      "settings.form_endpoint": ""
     },
     "hi": {
       "brand.tagline": "जहाँ भारत दुनिया को स्वास्थ्य देता है",
@@ -458,7 +459,8 @@
       "page.bariatric.title": "बेरिएट्रिक सर्जरी",
       "page.bariatric.sub": "मान्यता प्राप्त अस्पतालों में अनुभवी सर्जनों द्वारा की जाने वाली गैस्ट्रिक स्लीव, गैस्ट्रिक बाईपास और मेटाबॉलिक वज़न घटाने की प्रक्रियाएं।",
       "page.bariatric.cta_title": "बेरिएट्रिक सर्जरी के बारे में पूछें",
-      "page.bariatric.cta_sub": "अनुकूलित उपचार अनुमान प्राप्त करने के लिए अपनी मेडिकल रिपोर्ट और बीएमआई इतिहास साझा करें।"
+      "page.bariatric.cta_sub": "अनुकूलित उपचार अनुमान प्राप्त करने के लिए अपनी मेडिकल रिपोर्ट और बीएमआई इतिहास साझा करें।",
+      "settings.form_endpoint": ""
     },
     "fr": {
       "brand.tagline": "Là où l'Inde soigne le monde",
@@ -688,7 +690,8 @@
       "page.bariatric.title": "Chirurgie bariatrique",
       "page.bariatric.sub": "Sleeve gastrectomie, bypass gastrique et procédures métaboliques de perte de poids, réalisées par des chirurgiens expérimentés dans des hôpitaux accrédités.",
       "page.bariatric.cta_title": "Une question sur la chirurgie bariatrique ?",
-      "page.bariatric.cta_sub": "Partagez vos comptes rendus médicaux et votre historique d'IMC pour recevoir une estimation de traitement personnalisée."
+      "page.bariatric.cta_sub": "Partagez vos comptes rendus médicaux et votre historique d'IMC pour recevoir une estimation de traitement personnalisée.",
+      "settings.form_endpoint": ""
     },
     "pt": {
       "brand.tagline": "Onde a Índia cuida do mundo",
@@ -918,7 +921,8 @@
       "page.bariatric.title": "Cirurgia bariátrica",
       "page.bariatric.sub": "Sleeve gástrico, bypass gástrico e procedimentos metabólicos de perda de peso, realizados por cirurgiões experientes em hospitais credenciados.",
       "page.bariatric.cta_title": "Tem dúvidas sobre cirurgia bariátrica?",
-      "page.bariatric.cta_sub": "Compartilhe seus relatórios médicos e histórico de IMC para receber uma estimativa de tratamento personalizada."
+      "page.bariatric.cta_sub": "Compartilhe seus relatórios médicos e histórico de IMC para receber uma estimativa de tratamento personalizada.",
+      "settings.form_endpoint": ""
     },
     "ar": {
       "brand.tagline": "حيث تعالج الهند العالم",
@@ -1148,7 +1152,8 @@
       "page.bariatric.title": "جراحة السمنة",
       "page.bariatric.sub": "تكميم المعدة والمجازة المعدية وإجراءات إنقاص الوزن الأيضية، يقوم بها جراحون ذوو خبرة في مستشفيات معتمدة.",
       "page.bariatric.cta_title": "استفسر عن جراحة السمنة",
-      "page.bariatric.cta_sub": "شارك تقاريرك الطبية وسجل مؤشر كتلة الجسم للحصول على تقدير علاج مخصص."
+      "page.bariatric.cta_sub": "شارك تقاريرك الطبية وسجل مؤشر كتلة الجسم للحصول على تقدير علاج مخصص.",
+      "settings.form_endpoint": ""
     }
   },
   "images": {

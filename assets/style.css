@@ -261,7 +261,8 @@ li { list-style: none; }
   display: flex; flex-direction: column; transition: transform .3s ease, box-shadow .3s ease;
 }
 .hospital-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.hospital-media { height: 190px; background: var(--color-neutral-200); }
+.hospital-media { height: 190px; background: var(--color-neutral-200); position: relative; overflow: hidden; }
+.cms-img-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
 .hospital-body { padding: 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .hospital-loc { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-neutral-600); }
 .hospital-body h3 { font-size: 22px; margin: 0; }
@@ -359,7 +360,8 @@ li { list-style: none; }
 
 /* destination */
 .destination-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: clamp(24px,4vw,48px); margin-top: 44px; align-items: center; }
-.destination-media { border-radius: calc(28px * 1.4); overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 16/11; background: var(--color-neutral-200); }
+.destination-media { border-radius: calc(28px * 1.4); overflow: hidden; box-shadow: var(--shadow-md); aspect-ratio: 16/11; background: var(--color-neutral-200); position: relative; }
+.story-photo { position: relative; overflow: hidden; }
 
 /* faq */
 .faq-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }

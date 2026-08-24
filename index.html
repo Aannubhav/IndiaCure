@@ -60,7 +60,7 @@
 
 <section class="hero">
   <div class="hero-media">
-    <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?q=80&w=1600&auto=format&fit=crop" alt="Hospital corridor" loading="eager">
+    <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?q=80&w=1600&auto=format&fit=crop" alt="Hospital corridor" loading="eager" data-cms-img="hero.bg">
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
@@ -234,7 +234,7 @@
 
     <div class="hospital-grid">
       <article class="hospital-card">
-        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Delhi</div></div>
+        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Delhi</div><img class="cms-img-overlay" data-cms-img="hospital.a.img" alt="Hospital A exterior"></div>
         <div class="hospital-body">
           <span class="hospital-loc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10z"></path><circle cx="12" cy="11" r="2.2"></circle></svg> Delhi, India</span>
           <h3><span data-i18n="hospital.a.name">Hospital A</span> <span class="placeholder-note" data-i18n="hospital.placeholder">(placeholder)</span></h3>
@@ -248,7 +248,7 @@
         </div>
       </article>
       <article class="hospital-card">
-        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Mumbai</div></div>
+        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Mumbai</div><img class="cms-img-overlay" data-cms-img="hospital.b.img" alt="Hospital B exterior"></div>
         <div class="hospital-body">
           <span class="hospital-loc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10z"></path><circle cx="12" cy="11" r="2.2"></circle></svg> Mumbai, India</span>
           <h3><span data-i18n="hospital.b.name">Hospital B</span> <span class="placeholder-note" data-i18n="hospital.placeholder">(placeholder)</span></h3>
@@ -262,7 +262,7 @@
         </div>
       </article>
       <article class="hospital-card">
-        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Bengaluru</div></div>
+        <div class="hospital-media"><div class="img-placeholder">Hospital exterior — Bengaluru</div><img class="cms-img-overlay" data-cms-img="hospital.c.img" alt="Hospital C exterior"></div>
         <div class="hospital-body">
           <span class="hospital-loc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10z"></path><circle cx="12" cy="11" r="2.2"></circle></svg> Bengaluru, India</span>
           <h3><span data-i18n="hospital.c.name">Hospital C</span> <span class="placeholder-note" data-i18n="hospital.placeholder">(placeholder)</span></h3>
@@ -378,7 +378,7 @@
   <div class="story-track-wrap">
     <div class="story-track">
       <div class="story-slide">
-        <div class="story-photo"></div>
+        <div class="story-photo"><img class="cms-img-overlay" data-cms-img="story1.photo" alt="Patient photo"></div>
         <div>
           <div class="story-quote" data-i18n="story1.quote">"The coordination team handled the visa, the hospital paperwork and my follow-up calls. I only had to focus on getting better."</div>
           <div class="story-meta">
@@ -389,7 +389,7 @@
         </div>
       </div>
       <div class="story-slide">
-        <div class="story-photo"></div>
+        <div class="story-photo"><img class="cms-img-overlay" data-cms-img="story2.photo" alt="Patient photo"></div>
         <div>
           <div class="story-quote" data-i18n="story2.quote">"I spoke to the surgeon on a video call before booking anything. That conversation is what made me comfortable travelling."</div>
           <div class="story-meta">
@@ -400,7 +400,7 @@
         </div>
       </div>
       <div class="story-slide">
-        <div class="story-photo"></div>
+        <div class="story-photo"><img class="cms-img-overlay" data-cms-img="story3.photo" alt="Patient photo"></div>
         <div>
           <div class="story-quote" data-i18n="story3.quote">"Airport pickup, an interpreter at every appointment, and a check-in call two months after I flew home."</div>
           <div class="story-meta">
@@ -438,7 +438,7 @@
   <h2 style="font-size:clamp(30px,3.6vw,46px);margin:0" data-i18n="destination.title">Where We Operate</h2>
   <p style="font-size:18px;color:var(--color-neutral-700);margin:16px 0 0;max-width:52ch" data-i18n="destination.sub">IndiaCure coordinates treatment in India. Additional destinations will be listed as the network expands.</p>
   <div class="destination-grid">
-    <div class="destination-media"><div class="img-placeholder">India — city or hospital district</div></div>
+    <div class="destination-media"><div class="img-placeholder">India — city or hospital district</div><img class="cms-img-overlay" data-cms-img="destination.img" alt="India"></div>
     <div>
       <h3 style="font-size:clamp(26px,2.6vw,34px);margin:0" data-i18n="destination.india.title">India</h3>
       <p style="font-size:17px;color:var(--color-neutral-700);margin:14px 0 0" data-i18n="destination.india.desc">Six treatment cities, English-speaking clinical teams, and medical-visa processes designed for international patients.</p>
@@ -579,6 +579,7 @@
 </footer>
 
 <script src="assets/i18n.js"></script>
+<script src="assets/content-loader.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

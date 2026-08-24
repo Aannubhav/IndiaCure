@@ -116,9 +116,45 @@
   var docCountEl = document.querySelector(".doc-count");
   var activeDept = "All";
 
+  function t(key, fallback) {
+    if (window.I18N) {
+      var lang = window.I18N.get();
+      var dict = window.I18N.translations[lang] || {};
+      var en = window.I18N.translations.en || {};
+      return dict[key] != null ? dict[key] : (en[key] != null ? en[key] : fallback);
+    }
+    return fallback;
+  }
+
+  var DEPT_KEY_MAP = {
+    "Cardiology": "t.cardiology.name",
+    "Oncology": "t.oncology.name",
+    "Orthopedics": "t.orthopedics.name",
+    "Neurology": "t.neurology.name",
+    "Neurosurgery": "t.neurosurgery.name",
+    "Organ Transplant": "t.transplant.name",
+    "Urology": "t.urology.name",
+    "Gastroenterology": "t.gastro.name",
+    "Ophthalmology": "t.ophthalmology.name",
+    "Bariatric Surgery": "t.bariatric.name",
+    "Spine Surgery": "t.spine.name",
+    "Cosmetic Surgery": "t.cosmetic.name"
+  };
+  function deptLabel(dept) {
+    return dept === "All" ? "All" : t(DEPT_KEY_MAP[dept], dept);
+  }
+
   function rowHtml(label, value) {
     if (!value) return "";
     return '<div><dt>' + label + '</dt><dd>' + value + '</dd></div>';
+  }
+
+  function renderDeptFilter() {
+    if (!deptFilterEl) return;
+    var depts = ["All"].concat(DOCTORS.map(function (d) { return d.dept; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
+    deptFilterEl.innerHTML = depts.map(function (name) {
+      return '<button type="button" class="dept-btn' + (name === activeDept ? " active" : "") + '" data-dept="' + name + '">' + deptLabel(name) + '</button>';
+    }).join("");
   }
 
   function renderDoctors() {
@@ -134,14 +170,14 @@
         return '<span class="doctor-chip">' + c + '</span>';
       }).join("");
       var rows = [
-        rowHtml("Areas of expertise", d.expertise),
-        rowHtml("Experience", d.experience),
-        rowHtml("Education &amp; training", d.education),
-        rowHtml("Awards &amp; accomplishments", d.awards),
-        rowHtml("Memberships", d.memberships),
-        rowHtml("Research &amp; publications", d.research),
-        rowHtml("OPD location &amp; timings", d.opd),
-        rowHtml("Contact", d.contact)
+        rowHtml(t("doctor.row.expertise", "Areas of expertise"), d.expertise),
+        rowHtml(t("doctor.row.experience", "Experience"), d.experience),
+        rowHtml(t("doctor.row.education", "Education &amp; training"), d.education),
+        rowHtml(t("doctor.row.awards", "Awards &amp; accomplishments"), d.awards),
+        rowHtml(t("doctor.row.memberships", "Memberships"), d.memberships),
+        rowHtml(t("doctor.row.research", "Research &amp; publications"), d.research),
+        rowHtml(t("doctor.row.opd", "OPD location &amp; timings"), d.opd),
+        rowHtml(t("doctor.row.contact", "Contact"), d.contact)
       ].join("");
 
       return (
@@ -150,19 +186,19 @@
             '<div class="doctor-photo">Photo</div>' +
             '<div>' +
               '<h3>' + d.name + '</h3>' +
-              '<div class="doctor-dept">' + d.dept + '</div>' +
+              '<div class="doctor-dept">' + deptLabel(d.dept) + '</div>' +
             '</div>' +
           '</div>' +
           '<p class="doctor-title">' + d.title + '</p>' +
           '<p class="doctor-hospitals">' + d.hospitals + '</p>' +
           '<div class="doctor-chips">' + chips + '</div>' +
           '<details class="doctor-details">' +
-            '<summary>Full profile ' +
+            '<summary>' + t("doctor.full_profile", "Full profile") + ' ' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>' +
             '</summary>' +
             '<dl class="doctor-rows">' + rows + '</dl>' +
           '</details>' +
-          '<a class="section-link" href="#consult">Request an appointment ' +
+          '<a class="section-link" href="#consult">' + t("doctor.request_appt", "Request an appointment") + ' ' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>' +
           '</a>' +
         '</article>'
@@ -171,22 +207,23 @@
   }
 
   if (deptFilterEl) {
-    var depts = ["All"].concat(DOCTORS.map(function (d) { return d.dept; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
-    deptFilterEl.innerHTML = depts.map(function (name) {
-      return '<button type="button" class="dept-btn' + (name === "All" ? " active" : "") + '" data-dept="' + name + '">' + name + '</button>';
-    }).join("");
-
+    renderDeptFilter();
     deptFilterEl.addEventListener("click", function (e) {
       var btn = e.target.closest(".dept-btn");
       if (!btn) return;
       activeDept = btn.getAttribute("data-dept");
       deptFilterEl.querySelectorAll(".dept-btn").forEach(function (b) {
-        b.classList.toggle("active", b === btn);
+        b.classList.toggle("active", b.getAttribute("data-dept") === activeDept);
       });
       renderDoctors();
     });
   }
   renderDoctors();
+
+  document.addEventListener("i18n:change", function () {
+    renderDeptFilter();
+    renderDoctors();
+  });
 
   /* ---------- patient stories carousel ---------- */
   var track = document.querySelector(".story-track");
@@ -244,7 +281,7 @@
         var n = fileInput.files.length;
         uploadLabel.textContent = n
           ? n + " file" + (n > 1 ? "s" : "") + " attached"
-          : "Choose files or drag them here";
+          : t("form.upload_title", "Choose files or drag them here");
       });
     }
 
@@ -252,10 +289,10 @@
       e.preventDefault();
       var status = form.querySelector(".form-status");
       var submitBtn = form.querySelector('button[type="submit"]');
-      if (submitBtn) submitBtn.textContent = "Request received — we will be in touch";
+      if (submitBtn) submitBtn.textContent = t("form.status", "Request received — we will be in touch shortly.");
       if (status) status.classList.add("visible");
       form.reset();
-      if (uploadLabel) uploadLabel.textContent = "Choose files or drag them here";
+      if (uploadLabel) uploadLabel.textContent = t("form.upload_title", "Choose files or drag them here");
     });
   }
 

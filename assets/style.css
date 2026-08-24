@@ -419,3 +419,16 @@ li { list-style: none; }
   .hero-title { max-width: 16ch; }
   .btn { font-size: 14px; }
 }
+
+/* RTL support (Arabic) */
+html[dir="rtl"] .nav-inner { direction: rtl; }
+html[dir="rtl"] .brand { margin-right: 0; margin-left: auto; }
+html[dir="rtl"] .header-cta { order: 3; }
+html[dir="rtl"] .scroll-down { left: 50%; right: auto; transform: translateX(-50%); }
+html[dir="rtl"] .step::before { left: auto; right: 0; }
+html[dir="rtl"] .doctor-details summary,
+html[dir="rtl"] .section-link,
+html[dir="rtl"] .hospital-loc,
+html[dir="rtl"] .form-note,
+html[dir="rtl"] .consult-list li { direction: rtl; }
+html[dir="rtl"] .faq-item summary { direction: rtl; }

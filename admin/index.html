@@ -23,12 +23,14 @@
   .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   input[type=password], input[type=text]{flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit}
+  select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff}
   button{cursor:pointer;border:1px solid transparent;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;font-family:inherit}
   .btn-primary{background:var(--accent);color:#fff}
   .btn-primary:hover{background:var(--accent-dark)}
   .btn-secondary{background:#fff;border-color:var(--border);color:var(--text)}
   .btn-secondary:hover{background:#f0f3f6}
   .btn-danger{background:#fff;border-color:var(--danger);color:var(--danger)}
+  button:disabled{opacity:.5;cursor:not-allowed}
   #status{font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none}
   #status.info{display:block;background:#e6f6f6;color:var(--accent-dark)}
   #status.error{display:block;background:#fbe9e7;color:var(--danger)}
@@ -46,10 +48,12 @@
   .img-slot .key{font-size:11px;font-family:ui-monospace,monospace;color:var(--muted)}
   .img-slot img{width:100%;height:110px;object-fit:cover;border-radius:6px;background:#eef2f7;display:none}
   .img-slot img.has-src{display:block}
-  #hidden-content{display:none}
-  .save-bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:16px 24px;display:flex;justify-content:flex-end;gap:10px}
+  .save-bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .save-bar .row{gap:16px}
   .muted{color:var(--muted);font-size:13px}
   a{color:var(--accent)}
+  .lang-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;margin-left:8px}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -66,7 +70,7 @@
 
   <div class="card" id="tokenCard">
     <h3 style="margin-top:0">Connect to GitHub</h3>
-    <p class="muted">Paste a GitHub personal access token scoped to the <code>Aannubhav/IndiaCure</code> repo (Contents: Read and write). It is stored only in this browser's local storage and sent only to <code>api.github.com</code> — never to any other server.</p>
+    <p class="muted">Paste a GitHub personal access token scoped to the <code>Aannubhav/IndiaCure</code> repo, with <strong>Contents: Read and write</strong> permission explicitly enabled. Stored only in this browser's local storage, sent only to <code>api.github.com</code>.</p>
     <div class="row">
       <input type="password" id="tokenInput" placeholder="github_pat_...">
       <button class="btn-primary" id="connectBtn">Connect</button>
@@ -83,16 +87,33 @@
     </div>
 
     <div class="card">
-      <h3 style="margin-top:0">Text content</h3>
-      <p class="muted">Grouped by section. Click a section to expand it.</p>
-      <div id="textGroups"></div>
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <h3 style="margin:0">Text content <span class="lang-badge" id="langBadge">EN</span></h3>
+          <p class="muted" style="margin:6px 0 0">Editing <strong>English</strong> and saving will automatically machine-translate any changed text into Hindi, French, Portuguese and Arabic. Switching to another language below lets you hand-edit that language directly (those edits are <em>not</em> auto-translated).</p>
+        </div>
+        <select id="langSelect">
+          <option value="en">English (source)</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="fr">Français (French)</option>
+          <option value="pt">Português (Portuguese)</option>
+          <option value="ar">العربية (Arabic)</option>
+        </select>
+      </div>
+      <div id="textGroups" style="margin-top:16px"></div>
     </div>
   </div>
 </div>
 
 <div class="save-bar" id="saveBar" style="display:none">
-  <button class="btn-secondary" id="reloadBtn">Reload from GitHub</button>
-  <button class="btn-primary" id="saveBtn">Save All Changes</button>
+  <label class="checkbox-row">
+    <input type="checkbox" id="autoTranslateCheck" checked>
+    Auto-translate changed English text into other languages
+  </label>
+  <div class="row">
+    <button class="btn-secondary" id="reloadBtn">Reload from GitHub</button>
+    <button class="btn-primary" id="saveBtn">Save All Changes</button>
+  </div>
 </div>
 
 <script>
@@ -103,6 +124,8 @@
   var REPO = "IndiaCure";
   var BRANCH = "main";
   var API = "https://api.github.com/repos/" + OWNER + "/" + REPO;
+  var LANGS = ["en", "hi", "fr", "pt", "ar"];
+  var LANG_NAMES = { en: "English", hi: "Hindi", fr: "French", pt: "Portuguese", ar: "Arabic" };
 
   var STORAGE_KEY = "ic_admin_token";
   var statusEl = document.getElementById("status");
@@ -116,10 +139,15 @@
   var textGroups = document.getElementById("textGroups");
   var saveBtn = document.getElementById("saveBtn");
   var reloadBtn = document.getElementById("reloadBtn");
+  var langSelect = document.getElementById("langSelect");
+  var langBadge = document.getElementById("langBadge");
+  var autoTranslateCheck = document.getElementById("autoTranslateCheck");
 
   var currentSha = null;
-  var currentContent = null; // { text: {...}, images: {...} }
-  var pendingImageFiles = {}; // key -> File
+  var currentContent = null;   // { text: { en:{...}, hi:{...}, ... }, images: {...} }
+  var originalEnText = null;   // snapshot of text.en at last load/save, for diffing
+  var activeLang = "en";
+  var pendingImageFiles = {};
 
   function setStatus(msg, kind) {
     statusEl.className = kind || "info";
@@ -216,7 +244,17 @@
     });
   }
 
-  function buildTextGroups(text) {
+  function syncFormToMemory() {
+    if (!currentContent) return;
+    var langText = currentContent.text[activeLang];
+    textGroups.querySelectorAll("textarea[data-key]").forEach(function (ta) {
+      langText[ta.dataset.key] = ta.value;
+    });
+  }
+
+  function renderTextGroups(lang) {
+    var text = currentContent.text[lang];
+    langBadge.textContent = lang.toUpperCase();
     textGroups.innerHTML = "";
     var groups = {};
     var order = [];
@@ -245,6 +283,7 @@
         var ta = document.createElement("textarea");
         ta.value = text[key];
         ta.dataset.key = key;
+        ta.dir = lang === "ar" ? "rtl" : "ltr";
         ta.rows = text[key] && text[key].length > 90 ? 3 : 1;
         field.appendChild(ta);
 
@@ -256,14 +295,23 @@
     });
   }
 
+  langSelect.addEventListener("change", function () {
+    syncFormToMemory();
+    activeLang = langSelect.value;
+    renderTextGroups(activeLang);
+  });
+
   function loadContent() {
     setStatus("Loading content.json from GitHub…", "info");
     return ghFetch("/contents/content.json?ref=" + BRANCH).then(function (data) {
       currentSha = data.sha;
       currentContent = JSON.parse(base64ToUtf8(data.content));
+      originalEnText = Object.assign({}, currentContent.text.en);
       pendingImageFiles = {};
+      activeLang = "en";
+      langSelect.value = "en";
       buildImageGrid(currentContent.images || {});
-      buildTextGroups(currentContent.text || {});
+      renderTextGroups(activeLang);
       editorArea.style.display = "";
       saveBar.style.display = "flex";
       clearStatus();
@@ -296,13 +344,8 @@
   function uploadImage(key, file) {
     var path = "assets/uploads/" + slugify(key) + extFor(file);
     return fileToBase64(file).then(function (b64) {
-      // check if a file already exists at this path, to include its sha (overwrite)
       return ghFetch("/contents/" + path + "?ref=" + BRANCH).catch(function () { return null; }).then(function (existing) {
-        var body = {
-          message: "Admin: update image " + key,
-          content: b64,
-          branch: BRANCH
-        };
+        var body = { message: "Admin: update image " + key, content: b64, branch: BRANCH };
         if (existing && existing.sha) body.sha = existing.sha;
         return ghFetch("/contents/" + path, { method: "PUT", body: JSON.stringify(body) }).then(function () {
           return path;
@@ -311,51 +354,95 @@
     });
   }
 
+  // MyMemory is a free, keyless translation API — fine for short marketing copy,
+  // not a substitute for professional review of the translated strings.
+  function translateText(text, targetLang) {
+    var url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(text) + "&langpair=en|" + targetLang;
+    return fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+      if (data && data.responseData && data.responseData.translatedText) {
+        return data.responseData.translatedText;
+      }
+      throw new Error("empty translation response");
+    });
+  }
+
+  function delay(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+
+  function retranslateChangedKeys(changedKeys) {
+    var targets = LANGS.filter(function (l) { return l !== "en"; });
+    var tasks = [];
+    changedKeys.forEach(function (key) {
+      targets.forEach(function (lang) { tasks.push({ key: key, lang: lang }); });
+    });
+    if (!tasks.length) return Promise.resolve();
+
+    function runNext(i) {
+      if (i >= tasks.length) return Promise.resolve();
+      var task = tasks[i];
+      setStatus("Translating " + (i + 1) + " of " + tasks.length + " (" + task.key + " → " + LANG_NAMES[task.lang] + ")…", "info");
+      var sourceText = currentContent.text.en[task.key];
+      return translateText(sourceText, task.lang).then(function (translated) {
+        currentContent.text[task.lang][task.key] = translated;
+      }).catch(function () {
+        // translation failed for this field — leave the previous value in place and continue
+      }).then(function () {
+        return delay(120).then(function () { return runNext(i + 1); });
+      });
+    }
+    return runNext(0);
+  }
+
   function saveAll() {
-    setStatus("Saving…", "info");
+    syncFormToMemory();
+    setStatus("Preparing save…", "info");
     saveBtn.disabled = true;
 
-    // 1. gather text field values
-    var text = {};
-    textGroups.querySelectorAll("textarea[data-key]").forEach(function (ta) {
-      text[ta.dataset.key] = ta.value;
-    });
+    var changedKeys = [];
+    if (autoTranslateCheck.checked) {
+      Object.keys(currentContent.text.en).forEach(function (key) {
+        if (currentContent.text.en[key] !== originalEnText[key] && currentContent.text.en[key] !== "") {
+          changedKeys.push(key);
+        }
+      });
+    }
 
-    // 2. upload any changed images first, sequentially (keeps things simple and avoids rate spikes)
     var imageKeys = Object.keys(pendingImageFiles);
     var images = Object.assign({}, currentContent.images || {});
 
-    function uploadNext(i) {
+    function uploadNextImage(i) {
       if (i >= imageKeys.length) return Promise.resolve();
       var key = imageKeys[i];
       setStatus("Uploading photo " + (i + 1) + " of " + imageKeys.length + " (" + key + ")…", "info");
       return uploadImage(key, pendingImageFiles[key]).then(function (path) {
         images[key] = path;
-        return uploadNext(i + 1);
+        return uploadNextImage(i + 1);
       });
     }
 
-    uploadNext(0).then(function () {
-      var newContent = { text: text, images: images };
-      setStatus("Saving content.json…", "info");
-      var body = {
-        message: "Admin: update site content",
-        content: utf8ToBase64(JSON.stringify(newContent, null, 2)),
-        sha: currentSha,
-        branch: BRANCH
-      };
-      return ghFetch("/contents/content.json", { method: "PUT", body: JSON.stringify(body) });
-    }).then(function (result) {
-      currentSha = result.content.sha;
-      currentContent.text = text;
-      currentContent.images = images;
-      pendingImageFiles = {};
-      setStatus("Saved. GitHub Pages / Vercel will redeploy in about a minute.", "ok");
-      saveBtn.disabled = false;
-    }).catch(function (err) {
-      setStatus("Save failed: " + err.message, "error");
-      saveBtn.disabled = false;
-    });
+    retranslateChangedKeys(changedKeys)
+      .then(function () { return uploadNextImage(0); })
+      .then(function () {
+        setStatus("Saving content.json…", "info");
+        var body = {
+          message: "Admin: update site content" + (changedKeys.length ? " (+ auto-translate " + changedKeys.length + " field(s))" : ""),
+          content: utf8ToBase64(JSON.stringify({ text: currentContent.text, images: images }, null, 2)),
+          sha: currentSha,
+          branch: BRANCH
+        };
+        return ghFetch("/contents/content.json", { method: "PUT", body: JSON.stringify(body) });
+      })
+      .then(function (result) {
+        currentSha = result.content.sha;
+        currentContent.images = images;
+        originalEnText = Object.assign({}, currentContent.text.en);
+        pendingImageFiles = {};
+        setStatus("Saved" + (changedKeys.length ? " and translated " + changedKeys.length + " field(s)" : "") + ". Live site updates in about a minute.", "ok");
+        saveBtn.disabled = false;
+      })
+      .catch(function (err) {
+        setStatus("Save failed: " + err.message, "error");
+        saveBtn.disabled = false;
+      });
   }
 
   function showConnected() {
@@ -385,9 +472,7 @@
   });
 
   reloadBtn.addEventListener("click", function () {
-    if (Object.keys(pendingImageFiles).length || document.querySelectorAll("textarea").length) {
-      if (!confirm("Discard unsaved changes and reload from GitHub?")) return;
-    }
+    if (!confirm("Discard unsaved changes and reload from GitHub?")) return;
     loadContent();
   });
 

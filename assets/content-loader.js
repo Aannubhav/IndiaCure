@@ -1,8 +1,8 @@
 /* IndiaCure — loads editable content from content.json (maintained via /admin)
-   and merges it over the built-in English defaults in window.I18N, then applies
-   editable images to any element carrying data-cms-img="<key>". Runs after
-   i18n.js (which must load first) and before app.js is not required, but is
-   the natural place in the script order. */
+   and merges it over the built-in per-language dictionaries in window.I18N,
+   then applies editable images to any element carrying data-cms-img="<key>".
+   content.json.text is keyed by language code, each holding the same dot-keys
+   used by data-i18n attributes (en/hi/fr/pt/ar). Must load after i18n.js. */
 (function () {
   "use strict";
 
@@ -23,11 +23,15 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data) return;
-        if (data.text && window.I18N && window.I18N.translations && window.I18N.translations.en) {
-          Object.keys(data.text).forEach(function (key) {
-            if (data.text[key] != null && data.text[key] !== "") {
-              window.I18N.translations.en[key] = data.text[key];
-            }
+        if (data.text && window.I18N && window.I18N.translations) {
+          Object.keys(data.text).forEach(function (lang) {
+            if (!window.I18N.translations[lang]) window.I18N.translations[lang] = {};
+            var langText = data.text[lang];
+            Object.keys(langText).forEach(function (key) {
+              if (langText[key] != null && langText[key] !== "") {
+                window.I18N.translations[lang][key] = langText[key];
+              }
+            });
           });
           window.I18N.apply(window.I18N.get());
         }
